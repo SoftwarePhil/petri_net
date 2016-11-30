@@ -11,7 +11,7 @@ This program is made to run a petri net simulation and will print all reachable 
 ####a transition that has inputs (1,0,0) and outputs (0,1,0)
 ####a transition that has inputs (1,0,0) and outputs (0,0,1)
 ####an initial configuration of (3,0,0)
-######we group the inputs of transitions together, for example the transition inputs equal [[1, 0, 0], [1, 0, 0]], the first element in the list is the inputs for transition 1, the second element in the list are the inputs for transition 2
+#####we group the inputs of transitions together, for example the transition inputs equal [[1, 0, 0], [1, 0, 0]], the first element in the list is the inputs for transition 1, the second element in the list is the inputs for transition 2
 
     iex>PetriNet.Net.run      
 ##this will output all states the above net can have                                                                              

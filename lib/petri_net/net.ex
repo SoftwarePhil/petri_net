@@ -12,7 +12,7 @@ defmodule PetriNet.Net do
        add_node(initial)
    end
 
-#add check for when there is more transions than elements in inputs/outputs list
+#add check when the amount of inputs does not equal the amount of outputs
    def validate_net(places, transitions, inputs, outputs, initial) do
        with false <- Enum.any?(inputs,  fn(t) -> Enum.count(t) != places end), #if the size of the inputs is larger than the amount of places --
             false <- Enum.any?(outputs, fn(t) -> Enum.count(t) != places end),
