@@ -12,7 +12,7 @@ defmodule PetriNet.Net do
        add_node(initial)
    end
 
-   #add check for when there is more transions than elements in inputs/outputs list
+#add check for when there is more transions than elements in inputs/outputs list
    def validate_net(places, transitions, inputs, outputs, initial) do
        with false <- Enum.any?(inputs,  fn(t) -> Enum.count(t) != places end), #if the size of the inputs is larger than the amount of places --
             false <- Enum.any?(outputs, fn(t) -> Enum.count(t) != places end),
@@ -21,10 +21,25 @@ defmodule PetriNet.Net do
    end
 
 #GenServer client
+   def run do
+       step
+       case check_done do
+           false -> run
+           true  ->
+                    {_inital, _transitions, current_nodes} = net_state
+                    IO.inspect current_nodes
+
+       end
+   end
+   
    def step do
        GenServer.cast(@name, :dead_nodes)
        {_inital, transitions, current_nodes} = net_state
        fire_each(transitions, current_nodes)
+   end
+
+   def update_nodes(nodes) do
+       GenServer.cast(@name, {:update, nodes})
    end
    
    def add_node(state) do
@@ -35,6 +50,7 @@ defmodule PetriNet.Net do
        GenServer.call(@name, :get_state)
    end
 
+#mark node done after it fires each
    def fire_each(all_transitions, current_tree) do
         Enum.each(current_tree, 
             fn(node) ->
@@ -44,11 +60,31 @@ defmodule PetriNet.Net do
                                 case can_fire?(state, current_transition) do
                                     true  -> {:new, fire_transition(state, current_transition)}
                                     false ->  :cannot_fire
+                                end
+                            end)
+                        {:off, _state}       -> {:off, :cannot_fire}
+                        {:exhausted, _state} -> {:done, :cannot_fire} 
+                    end
+                    case node do
+                        #mark node as 'exhausted'
+                        {:on, _state}    -> mark_node_exhausted(node)
+                        {_other, _state} -> {:done, :cannot_fire}
+                    end  
+                end)
+   end
+
+   defp mark_node_exhausted(node) do
+        {_intital, _t, all_nodes} = net_state
+
+        Enum.map(all_nodes, fn(test_node) -> 
+                                with {state, n} = test_node do
+                                    case test_node do
+                                        test_node when test_node == node -> {:exhausted, n}
+                                        _                                -> {state, n}
+                                    end
                                 end 
                             end)
-                        {:off, _state} -> {:off, :cannot_fire} 
-                    end 
-                end)
+        |>update_nodes    
    end
 
    def mark_nodes_dead(all_transitions, state) do
@@ -62,7 +98,8 @@ defmodule PetriNet.Net do
                         else 
                             {:off, state}
                         end
-                    {:off, state} -> {:off, state}
+                    {:off, state}       -> {:off, state}
+                    {:exhausted, state} -> {:exhausted, state}
                     end
         end)
    end
@@ -75,8 +112,6 @@ defmodule PetriNet.Net do
        end
    end
 
-#when a transition is fired and possible outcome nodes are added, the node needs to be maked as 'done' or something,
-#not sure how to check this though
    def fire_transition(state, transtion) do
         node = with {_t, inputs, outputs} = transtion do
                 List.zip([state, inputs, outputs])
@@ -84,6 +119,17 @@ defmodule PetriNet.Net do
             end
         
         add_node(node)
+    end
+
+    def check_done do
+        {_intital, _t, all_nodes} = net_state
+
+        Enum.all?(all_nodes,fn(node) -> 
+                                case node do
+                                    {status, _state} when status == :on -> false
+                                    _                                   -> true
+                                end
+                            end)
     end
 
     #GenServer calls
@@ -99,12 +145,23 @@ defmodule PetriNet.Net do
         {:noreply, {initial, transitions, mark_nodes_dead(transitions, current_nodes)}}
     end
 
+    def handle_cast({:update, nodes}, {initial, transitions, _current_nodes}) do
+        {:noreply, {initial, transitions, nodes}}
+    end
+
     def handle_call(:get_state, _from, state) do
         {:reply, state, state}
     end
 end
 
+#TODO: 
+#       1. handle case of unbounded petri nets, fix caulctions that will have a 'w'
+#       2. write input gather to get the 'right' input for valid petri nets
+#           2a. if the user messes up make sure the state stays the same and re-ask 
+
 #PetriNet.Net.create(2,1, [[1, 0], [0, 1]], [[0, 1]], [1, 0])
-#PetriNet.Net.step 
 
 #PetriNet.Net.create(3,2, [[1, 0, 0], [0, 1, 0]], [[1, 1, 0], [0,0,1]], [1, 0, 0])
+
+#PetriNet.Net.create(3,2, [[1, 0, 0], [1, 0, 0]], [[0, 1, 0], [0, 0, 1]], [3, 0, 0])
+#PetriNet.Net.run
