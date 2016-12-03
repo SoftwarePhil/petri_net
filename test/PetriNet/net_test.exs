@@ -18,7 +18,11 @@ defmodule PetriNet.NetTest do
         assert result == [exhausted: [1, 0], recursive: [1, "w"]]   
     end
 
-    test "another bounded net test" do
+    test "unbounded petri net test, with w transitions being fired" do
+        PetriNet.Net.create(3,3, [[1,0,0], [1,0,0], [0,1,1]], [[1,1,0], [0,0,1], [0,0,1]], [1,0,0]) 
         
+        [_fire_history, all_nodes: result] = assert PetriNet.Net.run 
+        assert result == [exhausted: [1, 0, 0], recursive: [1, "w", 0], off: [0, 0, 1],                                                                             
+                          recursive: [0, "w", 1]] 
     end
 end

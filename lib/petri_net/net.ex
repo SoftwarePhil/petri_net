@@ -112,6 +112,7 @@ defmodule PetriNet.Net do
                         end
                     {:off, state}       -> {:off, state}
                     {:exhausted, state} -> {:exhausted, state}
+                    {:recursive, state} -> {:recursive, state}
                     end
         end)
    end
@@ -147,6 +148,14 @@ defmodule PetriNet.Net do
         end
     end
 
+    def sub_w(num1, num2) do
+        case {num1, num2} do
+            {"w", _num}  -> "w"
+            {a  ,   "w"} -> a 
+            {a  ,     b} -> a - b
+        end
+    end
+
     #a check for recursive w transitions
     def check_w(before_state, after_state) when before_state == after_state do
         mark_node({:on, after_state}, :recursive)
@@ -156,7 +165,7 @@ defmodule PetriNet.Net do
     #checks if a transition will cause net to be unbounded 
     def check_w(before_state, after_state) do    
         with list  = List.zip([before_state, after_state]),
-                done? = Enum.map(list, fn({current, next}) -> current - next end),
+                done? = Enum.map(list, fn({current, next}) -> sub_w(current, next) end),
                 test  = Enum.all?(done?, fn(x) -> x <= 0 end)
             do    
                 if(test) do
@@ -224,3 +233,5 @@ end
 #PetriNet.Net.create(2,1, [[1,0]], [[1,1]], [1,0])
 
 #PetriNet.Net.create(5, 5, [[1,0,0,0,0],[0,1,0,0,0],[0,0,0,0,1],[0,0,0,1,0],[0,0,1,0,1]], [[0,1,0,1,0],[0,0,1,0,0],[0,0,0,1,0],[0,0,0,0,1],[1,0,0,0,0]], [1,0,0,0,0])
+
+#PetriNet.Net.create(3,3, [[1,0,0], [1,0,0], [0,1,1]], [[1,1,0], [0,0,1], [0,0,1]], [1,0,0])
