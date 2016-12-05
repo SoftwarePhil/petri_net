@@ -29,7 +29,6 @@ defmodule PetriNet.Net do
            true  ->
                     {fire_history, _transitions, current_nodes} = net_state
                     [fire_history: fire_history, all_nodes: current_nodes]
-
        end
    end
    
@@ -63,6 +62,10 @@ defmodule PetriNet.Net do
         with {:ok, state} <- validate_net(places, transitions, inputs, outputs, initial) do
             GenServer.call(@name, {:clear, {[], state, [on: initial]}})
         end
+   end
+
+   def check_status do
+       GenServer.whereis(@name)
    end
 
 #mark node done after it fires each
@@ -152,7 +155,7 @@ defmodule PetriNet.Net do
      def w?(num1, num2) do
         case {num1, num2} do
             {"w", _num} -> 1
-            {a  ,   b} -> a + b 
+            {a  ,    b} -> a + b 
         end
     end
 
@@ -231,8 +234,8 @@ defmodule PetriNet.Net do
 end
 
 #TODO: 
-#       1. write input gather to get the 'right' input for valid petri nets
-#           1a. if the user messes up make sure the state stays the same and re-ask 
+#       1. make more code more efficent, don't look through finished firing states again .. 1 process per fire all
+#       2. remove dependence on GenServer .. have state be self contained in single function
 
 #PetriNet.Net.create(2,1, [[1, 0]], [[0, 1]], [1, 0])
 

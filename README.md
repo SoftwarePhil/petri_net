@@ -10,7 +10,7 @@ This program is made to run a **petri net** simulation and will print all reacha
 #####we group the inputs of transitions together, for example the transition inputs equal [[1, 0, 0], [1, 0, 0]], the first element in the list is the inputs for transition 1, the second element in the list is the inputs for transition 2
 
     iex>PetriNet.Net.run      
-###this will output each transition that was fired and the current state of the net at the time of firing, as well every reachable state                                                                              
+###this will output each transition that was fired and the current state of the net at the time of firing, state after firing, as well every reachable state                                                                              
     [fire_history: [
         {1, [3, 0, 0], [2, 1, 0]}, 
         {2, [3, 0, 0], [2, 0, 1]},                                                                                  
