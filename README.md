@@ -38,9 +38,9 @@ This program is made to run a **petri net** simulation and will print all reacha
         off: [0, 0, 3]
         ]
     ]  
-**fire history** has the list of {transition number that was fired, current state}
+**fire history** has the list of {transition number that was fired, current state, new state after transitions was fired}
 
-#####so {1, [3, 0, 0]} means that transition 1 was fired and that the state before fireing was [3,0,0]
+#####{1, [3, 0, 0], [2, 1, 0]},  means that transition 1 was fired and that the state before firing was [3,0,0] and after it became [2,1,0]
 **exhausted** means the transition is not a dead end, but all possible transition have been fired for that particular state
 
 **off** means a dead end
