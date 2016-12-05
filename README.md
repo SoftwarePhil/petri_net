@@ -23,7 +23,8 @@ This program is made to run a **petri net** simulation and will print all reacha
         {1, [1, 1, 1], [0, 2, 1]}, 
         {2, [1, 1, 1], [0, 1, 2]},                                                                                                
         {1, [1, 0, 2], [0, 1, 2]}, 
-        {2, [1, 0, 2], [0, 0, 3]}],                                                                                               
+        {2, [1, 0, 2], [0, 0, 3]}
+        ],                                                                                               
      all_nodes: [
         exhausted: [3, 0, 0], 
         exhausted: [2, 1, 0], 
@@ -34,7 +35,9 @@ This program is made to run a **petri net** simulation and will print all reacha
         off: [0, 3, 0], 
         off: [0, 2, 1], 
         off: [0, 1, 2], 
-        off: [0, 0, 3]]]  
+        off: [0, 0, 3]
+        ]
+    ]  
 **fire history** has the list of {transition number that was fired, current state}
 
 #####so {1, [3, 0, 0]} means that transition 1 was fired and that the state before fireing was [3,0,0]
