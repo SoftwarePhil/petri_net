@@ -59,6 +59,12 @@ defmodule PetriNet.Net do
        GenServer.call(@name, :get_state)
    end
 
+   def clear(places, transitions, inputs, outputs, initial) do
+        with {:ok, state} <- validate_net(places, transitions, inputs, outputs, initial) do
+            GenServer.call(@name, {:clear, {[], state, [on: initial]}})
+        end
+   end
+
 #mark node done after it fires each
    def fire_each(all_transitions, current_tree) do
         Enum.each(current_tree, 
@@ -69,8 +75,9 @@ defmodule PetriNet.Net do
                                 case can_fire?(state, current_transition) do
                                     true  -> 
                                         {t, _inputs, _outputs} = current_transition
-                                        add_history({t, state})
-                                        {:new, fire_transition(state, current_transition)}
+                                        new_state = fire_transition(state, current_transition)
+                                        add_history({t, state, new_state})
+                                        {:new, new_state}
                                     false ->  :cannot_fire
                                 end
                             end)
@@ -130,8 +137,9 @@ defmodule PetriNet.Net do
                 List.zip([state, inputs, outputs])
                 |>Enum.map(fn {pi, ti, to} -> w(pi, -ti + to) end)   #pi - ti + to  
             end
-        check_w(state, node)
-        |>add_node
+        node = check_w(state, node)
+        add_node(node)
+        node
     end
 
     def w(num1, num2) do
@@ -216,13 +224,17 @@ defmodule PetriNet.Net do
     def handle_call(:get_state, _from, state) do
         {:reply, state, state}
     end
+
+    def handle_call({:clear, new_state}, _from, _state) do
+        {:reply, :ok, new_state}
+    end
 end
 
 #TODO: 
 #       1. write input gather to get the 'right' input for valid petri nets
 #           1a. if the user messes up make sure the state stays the same and re-ask 
 
-#PetriNet.Net.create(2,1, [[1, 0], [0, 1]], [[0, 1]], [1, 0])
+#PetriNet.Net.create(2,1, [[1, 0]], [[0, 1]], [1, 0])
 
 #PetriNet.Net.create(3,2, [[1, 0, 0], [0, 1, 0]], [[1, 1, 0], [0,0,1]], [1, 0, 0])
 

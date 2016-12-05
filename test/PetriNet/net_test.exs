@@ -25,4 +25,16 @@ defmodule PetriNet.NetTest do
         assert result == [exhausted: [1, 0, 0], recursive: [1, "w", 0], off: [0, 0, 1],                                                                             
                           recursive: [0, "w", 1]] 
     end
+
+    test "bigger bounded petri net test" do
+        PetriNet.Net.create(5, 5, [[1,0,0,0,0],[0,1,0,0,0],[0,0,0,0,1],[0,0,0,1,0],[0,0,1,0,1]], 
+                                        [[0,1,0,1,0],[0,0,1,0,0],[0,0,0,1,0],[0,0,0,0,1],[1,0,0,0,0]], [1,0,0,0,0])
+        
+        [_fire_history, all_nodes: result] = assert PetriNet.Net.run 
+        assert result == [
+                          exhausted: [1, 0, 0, 0, 0], exhausted: [0, 1, 0, 1, 0],                                                                                   
+                          exhausted: [0, 0, 1, 1, 0], exhausted: [0, 1, 0, 0, 1],                                                                                              
+                          exhausted: [0, 0, 1, 0, 1]
+                         ]  
+    end
 end

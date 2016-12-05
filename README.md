@@ -12,20 +12,19 @@ This program is made to run a **petri net** simulation and will print all reacha
     iex>PetriNet.Net.run      
 ###this will output each transition that was fired and the current state of the net at the time of firing, as well every reachable state                                                                              
     [fire_history: [
-        {1, [3, 0, 0]}, 
-        {2, [3, 0, 0]}, 
-        {1, [2, 1, 0]}, 
-        {2, [2, 1, 0]},                                                                        
-        {1, [2, 0, 1]}, 
-        {2, [2, 0, 1]}, 
-        {1, [1, 2, 0]}, 
-        {2, [1, 2, 0]},                                                                                      
-        {1, [1, 1, 1]}, 
-        {2, [1, 1, 1]}, 
-        {1, [1, 0, 2]}, 
-        {2, [1, 0, 2]}
-    ],                                                                                     
-    all_nodes: [
+        {1, [3, 0, 0], [2, 1, 0]}, 
+        {2, [3, 0, 0], [2, 0, 1]},                                                                                  
+        {1, [2, 1, 0], [1, 2, 0]}, 
+        {2, [2, 1, 0], [1, 1, 1]},                                                                                                
+        {1, [2, 0, 1], [1, 1, 1]}, 
+        {2, [2, 0, 1], [1, 0, 2]},                                                                                                
+        {1, [1, 2, 0], [0, 3, 0]}, 
+        {2, [1, 2, 0], [0, 2, 1]},                                                                                                
+        {1, [1, 1, 1], [0, 2, 1]}, 
+        {2, [1, 1, 1], [0, 1, 2]},                                                                                                
+        {1, [1, 0, 2], [0, 1, 2]}, 
+        {2, [1, 0, 2], [0, 0, 3]}],                                                                                               
+     all_nodes: [
         exhausted: [3, 0, 0], 
         exhausted: [2, 1, 0], 
         exhausted: [2, 0, 1],                                                                         
@@ -35,8 +34,7 @@ This program is made to run a **petri net** simulation and will print all reacha
         off: [0, 3, 0], 
         off: [0, 2, 1], 
         off: [0, 1, 2], 
-        off: [0, 0, 3]]
-    ]
+        off: [0, 0, 3]]]  
 **fire history** has the list of {transition number that was fired, current state}
 
 #####so {1, [3, 0, 0]} means that transition 1 was fired and that the state before fireing was [3,0,0]
@@ -50,12 +48,13 @@ This program is made to run a **petri net** simulation and will print all reacha
         iex>PetriNet.Net.create(2,1, [[1,0]], [[1,1]], [1,0])
         iex>PetriNet.Net.run 
 
-        [
-            fire_history: [{1, [1, 0]}, {1, [1, "w"]}
-            ],                                                                                                           
-            all_nodes:[
-                exhausted: [1, 0], 
-                recursive: [1, "w"]
+       [
+           fire_history: [
+               {1, [1, 0], [1, "w"]}, 
+               {1, [1, "w"], [1, "w"]}
+            ],                                                                                       
+        all_nodes: [
+            exhausted: [1, 0], 
+            recursive: [1, "w"]
             ]
-        ] 
-####
+        ]
